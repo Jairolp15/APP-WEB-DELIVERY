@@ -1,0 +1,22 @@
+{
+  "name": "bocados-app",
+  "version": "1.0.0",
+  "description": "BOCADOS APP – Fast Food PWA",
+  "main": "index.html",
+  "scripts": {
+    "start": "serve ."
+  },
+  "dependencies": {
+    "serve": "^14.2.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "pwa",
+    "delivery",
+    "food"
+  ],
+  "author": "Antigravity",
+  "license": "MIT"
+}

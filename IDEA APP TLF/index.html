@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>BOCADOS APP – Fast Food App</title>
+  <meta name="description"
+    content="Pide tu comida favorita en minutos. Delivery o Pick-up, con rastreo en tiempo real y recompensas por cada pedido." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet" />
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#FF416C" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="css/improvements.css" />
+  <link rel="icon" type="image/jpeg" href="assets/logo_bocados.jpg" />
+</head>
+
+<body>
+
+  <!-- ═══════════════════════════════ SPLASH SCREEN ═══════════════════════════════ -->
+  <div id="splash-screen" class="splash">
+    <div class="splash-content">
+      <div class="splash-logo">
+        <img src="assets/logo_bocados.jpg" alt="Logo Bocados App"
+          style="width:100px; height:100px; border-radius:50%; margin-bottom:10px;">
+        <span class="logo-text">BOCADOS APP</span>
+      </div>
+      <div class="splash-tagline">El mejor sabor</div>
+      <div class="splash-loader">
+        <div class="loader-bar"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════ APP WRAPPER ═══════════════════════════════ -->
+  <div id="app" class="app hidden">
+
+    <!-- ─── NOTIFICATION TOAST ─── -->
+    <div id="toast" class="toast"></div>
+
+    <!-- ─── PUSH NOTIFICATION POPUP ─── -->
+    <div id="push-notif" class="push-notif hidden">
+      <div class="push-icon">🔔</div>
+      <div class="push-body">
+        <div class="push-title" id="push-title"></div>
+        <div class="push-text" id="push-text"></div>
+      </div>
+      <button class="push-close" onclick="closePush()">✕</button>
+    </div>
+
+    <!-- ═══════════════════ SCREEN: AUTH ═══════════════════ -->
+    <div id="screen-auth" class="screen active">
+      <div class="auth-bg">
+        <div class="auth-hero">
+          <div class="auth-logo">
+            <img src="assets/logo_bocados.jpg" alt="Logo Bocados App"
+              style="width:120px; height:120px; border-radius:50%; margin-bottom:15px; grid-column:span 2; justify-self:center;">
+            <h1 class="auth-brand">BOCADOS APP</h1>
+            <p class="auth-sub">Sabor en cada BOCADO</p>
+          </div>
+        </div>
+        <div class="auth-card">
+          <div class="auth-tabs">
+            <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Iniciar Sesión</button>
+            <button class="auth-tab" id="tab-register" onclick="switchTab('register')">Registrarse</button>
+          </div>
+
+          <!-- LOGIN FORM -->
+          <div id="form-login" class="auth-form active">
+            <div class="input-group">
+              <span class="input-icon">✉️</span>
+              <input type="email" id="login-email" placeholder="Correo electrónico" class="input-field" />
+            </div>
+            <div class="input-group">
+              <span class="input-icon">🔒</span>
+              <input type="password" id="login-pass" placeholder="Contraseña" class="input-field" />
+            </div>
+            <button class="btn-primary btn-full" onclick="doLogin()">Entrar</button>
+            <div class="auth-divider"><span>o continúa con</span></div>
+            <div class="social-btns">
+              <button class="btn-social" onclick="doSocialLogin('Google')">
+                <svg width="18" height="18" viewBox="0 0 24 24">
+                  <path fill="#4285F4"
+                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                  <path fill="#34A853"
+                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                  <path fill="#FBBC05"
+                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                  <path fill="#EA4335"
+                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                </svg>
+                Google
+              </button>
+              <button class="btn-social" onclick="doSocialLogin('Apple')">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
+                  <path
+                    d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
+                </svg>
+                Apple
+              </button>
+            </div>
+          </div>
+
+          <!-- REGISTER FORM -->
+          <div id="form-register" class="auth-form">
+            <div class="input-group">
+              <span class="input-icon">👤</span>
+              <input type="text" id="reg-name" placeholder="Nombre completo" class="input-field" />
+            </div>
+            <div class="input-group">
+              <span class="input-icon">✉️</span>
+              <input type="email" id="reg-email" placeholder="Correo electrónico" class="input-field" />
+            </div>
+            <div class="input-group">
+              <span class="input-icon">🔒</span>
+              <input type="password" id="reg-pass" placeholder="Contraseña" class="input-field" />
+            </div>
+            <button class="btn-primary btn-full" onclick="doRegister()">Crear cuenta gratis</button>
+            <p class="auth-terms">Al registrarte aceptas nuestros <a href="#">Términos</a> y <a href="#">Privacidad</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════ MAIN SHELL (after auth) ═══════════════════ -->
+    <div id="main-shell" class="main-shell hidden">
+
+      <!-- ─── SCREENS CONTAINER ─── -->
+      <div class="screens-container">
+
+        <!-- ══ SCREEN: HOME ══ -->
+        <div id="screen-home" class="screen-main active">
+          <div class="screen-scroll">
+            <!-- Header -->
+            <div class="home-header">
+              <div class="header-location">
+                <span class="location-icon">📍</span>
+                <div class="location-info">
+                  <span class="location-label">Entregar en</span>
+                  <button class="location-addr" onclick="showAddressModal()">Campo Grande, Lagunillas <span
+                      class="chev">▾</span></button>
+                </div>
+              </div>
+              <button class="wallet-badge" onclick="navigateTo('wallet')">
+                <span class="wallet-icon">⭐</span>
+                <span class="wallet-pts" id="header-pts">350 pts</span>
+              </button>
+            </div>
+
+            <!-- One-tap Reorder CTA (Feature #5) -->
+            <div class="one-tap-cta" onclick="oneTapReorder()">
+              <div class="otc-emoji">🔄</div>
+              <div class="otc-info">
+                <div class="otc-title">¿Lo de siempre?</div>
+                <div class="otc-sub" id="last-order-name">Classic Burger + Papas · $14.90</div>
+              </div>
+              <button class="otc-btn">Repetir ⚡</button>
+            </div>
+
+            <!-- Search Bar with live dropdown (#2) -->
+            <div class="search-wrapper">
+              <div class="search-bar" onclick="navigateTo('menu')">
+                <span class="search-icon">🔍</span>
+                <span class="search-placeholder" data-i18n="search">¿Qué se te antoja hoy?</span>
+              </div>
+            </div>
+
+            <!-- Promo Carousel -->
+            <div class="promo-section">
+              <div class="promo-carousel" id="promo-carousel">
+                <div class="promo-slide active" style="background: linear-gradient(135deg,#FF416C,#FF4B2B)">
+                  <div class="promo-content">
+                    <div class="promo-badge">🔥 OFERTA DEL DÍA</div>
+                    <h3 class="promo-title">Combo Classic<br />-30% OFF</h3>
+                    <div class="promo-timer" id="timer1"></div>
+                  </div>
+                  <div class="promo-img">🍔</div>
+                </div>
+                <div class="promo-slide" style="background: linear-gradient(135deg,#4776E6,#8E54E9)">
+                  <div class="promo-content">
+                    <div class="promo-badge">⚡ NUEVO</div>
+                    <h3 class="promo-title">Burger BBQ<br />Doble carne</h3>
+                    <div class="promo-cta">Ver oferta</div>
+                  </div>
+                  <div class="promo-img">🥩</div>
+                </div>
+                <div class="promo-slide" style="background: linear-gradient(135deg,#11998e,#38ef7d)">
+                  <div class="promo-content">
+                    <div class="promo-badge">🥤 GRATIS</div>
+                    <h3 class="promo-title">Bebida gratis<br />en tu próximo pedido</h3>
+                    <div class="promo-cta">Canjear</div>
+                  </div>
+                  <div class="promo-img">🥤</div>
+                </div>
+              </div>
+              <div class="carousel-dots" id="carousel-dots"></div>
+            </div>
+
+            <!-- Flash Deals Section (#14) -->
+            <div class="flash-deals-section" id="flash-deals-section">
+              <div class="flash-header">
+                <div class="flash-title">⚡ Ofertas Flash</div>
+                <div class="flash-countdown">
+                  <div class="flash-num" id="fd-h">00</div>
+                  <div class="flash-sep">:</div>
+                  <div class="flash-num" id="fd-m">00</div>
+                  <div class="flash-sep">:</div>
+                  <div class="flash-num" id="fd-s">00</div>
+                </div>
+              </div>
+              <div class="flash-row" id="flash-deals-row"></div>
+            </div>
+
+            <!-- Categories -->
+            <div class="section-header">
+              <h2 class="section-title">Categorías</h2>
+              <a class="section-link" onclick="navigateTo('menu')">Ver todo</a>
+            </div>
+            <div class="categories-row">
+              <button class="cat-pill active"
+                onclick="navigateTo('menu','Hamburguesas')">🍔<br /><span>Hamburguesas</span></button>
+              <button class="cat-pill" onclick="navigateTo('menu','Bebidas')">🥤<br /><span>Bebidas</span></button>
+              <button class="cat-pill" onclick="navigateTo('menu','Combos')">🍟<br /><span>Combos</span></button>
+              <button class="cat-pill" onclick="navigateTo('menu','Postres')">🍦<br /><span>Postres</span></button>
+              <button class="cat-pill" onclick="navigateTo('menu','Snacks')">🌮<br /><span>Snacks</span></button>
+            </div>
+
+            <!-- Reorder Section -->
+            <div class="section-header">
+              <h2 class="section-title">🔄 Pedir de nuevo</h2>
+            </div>
+            <div class="reorder-list" id="reorder-list"></div>
+
+            <!-- Featured Products -->
+            <div class="section-header">
+              <h2 class="section-title">⭐ Más Populares</h2>
+              <a class="section-link" onclick="navigateTo('menu')">Ver todo</a>
+            </div>
+            <div class="featured-grid" id="featured-grid"></div>
+
+            <!-- Branches Near You -->
+            <div class="section-header">
+              <h2 class="section-title">📍 Sucursales cercanas</h2>
+            </div>
+            <div class="branches-list" id="branches-list"></div>
+
+            <div class="bottom-spacer"></div>
+          </div>
+        </div>
+
+        <!-- ══ SCREEN: MENU ══ -->
+        <div id="screen-menu" class="screen-main">
+          <div class="screen-header">
+            <h2 class="screen-title">Menú</h2>
+            <button class="header-icon-btn" onclick="navigateTo('cart')">
+              🛒
+              <span class="cart-badge" id="cart-badge-menu">0</span>
+            </button>
+          </div>
+          <!-- Search with live dropdown (#2) -->
+          <div class="menu-search-wrap">
+            <div class="search-wrapper">
+              <div class="search-bar-inline">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="menu-search" placeholder="Buscar en el menú..." class="search-input"
+                  data-i18n-ph="search" oninput="filterProducts(this.value)" />
+              </div>
+              <div id="search-dropdown"></div>
+            </div>
+          </div>
+          <!-- Sort / Filter controls -->
+          <div class="menu-controls">
+            <button class="menu-sort-btn active" onclick="setMenuFilter('all',this)">Todos</button>
+            <button class="menu-sort-btn" onclick="setMenuFilter('popular',this)">⭐ Populares</button>
+            <button class="menu-sort-btn menu-fav-filter" onclick="setMenuFilter('favorites',this)">❤️
+              Favoritos</button>
+          </div>
+          <!-- Category Tabs -->
+          <div class="menu-tabs" id="menu-tabs"></div>
+          <!-- Products Grid -->
+          <div class="menu-scroll">
+            <div class="products-grid" id="products-grid"></div>
+            <div class="load-more-spinner" id="load-more-spinner" style="display:none">
+              <div class="lms-ring"></div> Cargando más...
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ SCREEN: CART ══ -->
+        <div id="screen-cart" class="screen-main">
+          <div class="screen-header">
+            <button class="back-btn" onclick="history.back()">←</button>
+            <h2 class="screen-title">Mi Carrito</h2>
+            <button class="clear-cart-btn" onclick="clearCart()">Limpiar</button>
+          </div>
+          <div class="cart-scroll">
+            <div id="cart-items-list" class="cart-items"></div>
+            <div id="cart-empty" class="cart-empty hidden">
+              <div class="empty-icon">🛒</div>
+              <p>Tu carrito está vacío</p>
+              <button class="btn-primary" onclick="navigateTo('menu')">Ver Menú</button>
+            </div>
+            <!-- Promo Code -->
+            <div class="promo-code-row" id="promo-code-row">
+              <input type="text" id="promo-input" placeholder="Código de descuento" class="promo-input" />
+              <button class="btn-apply" onclick="applyPromo()">Aplicar</button>
+            </div>
+            <!-- Loyalty Points -->
+            <div class="loyalty-toggle-row" id="loyalty-row">
+              <div class="loyalty-info">
+                <span>⭐ Usar puntos de lealtad</span>
+                <span class="pts-available" id="pts-available"></span>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" id="use-pts-toggle" onchange="toggleLoyaltyPoints()" />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <!-- Calorie bar (#17) -->
+            <div class="cal-bar" id="cal-bar">
+              <div class="cal-header">
+                <span class="cal-title">🔥 Calorías estimadas</span>
+                <span class="cal-total" id="cal-total">0 kcal</span>
+              </div>
+              <div class="cal-progress">
+                <div class="cal-fill" id="cal-fill" style="width:0%"></div>
+              </div>
+              <div class="cal-label" id="cal-label-txt">0% del requerimiento diario</div>
+            </div>
+            <!-- Totals -->
+            <div class="cart-totals" id="cart-totals"></div>
+            <!-- Order Type -->
+            <div class="order-type-section">
+              <h3 class="section-subtitle">¿Cómo quieres recibir tu pedido?</h3>
+              <div class="order-type-tabs">
+                <button class="order-type-btn active" id="ot-pickup" onclick="setOrderType('pickup')">
+                  <span class="ot-icon">🏃</span>
+                  <span class="ot-label">Pick-up</span>
+                  <span class="ot-sub">Recoger en local</span>
+                </button>
+                <button class="order-type-btn" id="ot-delivery" onclick="setOrderType('delivery')">
+                  <span class="ot-icon">🚗</span>
+                  <span class="ot-label">Delivery</span>
+                  <span class="ot-sub">Entrega a domicilio</span>
+                </button>
+              </div>
+              <!-- Pickup options -->
+              <div id="pickup-options" class="order-type-detail">
+                <h4>Hora de recogida</h4>
+                <div class="time-slots" id="time-slots"></div>
+                <div class="branch-select-row">
+                  <span>📍 Sucursal más cercana</span>
+                  <strong>Campo Grande · 0.8 km</strong>
+                </div>
+              </div>
+              <!-- Delivery options -->
+              <div id="delivery-options" class="order-type-detail hidden">
+                <h4>Dirección de entrega</h4>
+                <div class="address-confirm-card" onclick="openDeliveryMap()">
+                  <span class="addr-icon">📍</span>
+                  <div class="addr-text">
+                    <strong>Campo Grande</strong>
+                    <span>Lagunillas, estado Zulia · Toca para confirmar en mapa</span>
+                  </div>
+                  <span class="addr-arrow">›</span>
+                </div>
+                <div class="payment-method-section">
+                  <h4>Método de pago</h4>
+                  <div class="payment-options">
+                    <label class="pay-option selected"><input type="radio" name="pay" value="card" checked /> 💳 Tarjeta
+                      **** 4242</label>
+                    <label class="pay-option"><input type="radio" name="pay" value="cash" /> 💵 Pago en efectivo</label>
+                    <label class="pay-option"><input type="radio" name="pay" value="transfer" /> 📱 Pago Móvil /
+                      Transferencias</label>
+                    <label class="pay-option"><input type="radio" name="pay" value="new" /> ➕ Nueva tarjeta</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="cart-footer" id="cart-footer">
+            <button class="btn-checkout" onclick="placeOrder()" id="checkout-btn">
+              Confirmar Pedido · <span id="checkout-total">$0.00</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- ══ SCREEN: TRACKING ══ -->
+        <div id="screen-tracking" class="screen-main">
+          <div class="tracking-header">
+            <button class="back-btn light" onclick="navigateTo('orders')">←</button>
+            <h2 class="screen-title light">Rastreo en Vivo</h2>
+            <button class="header-icon-btn light" onclick="showPushDemo()">🔔</button>
+          </div>
+          <div id="map-container" class="map-container"></div>
+          <div class="tracking-card">
+            <div class="tracking-status-bar" id="tracking-status-bar">
+              <div class="ts-step done" id="ts1"><span class="ts-dot"></span><span class="ts-label">Recibido</span>
+              </div>
+              <div class="ts-line done" id="tl1"></div>
+              <div class="ts-step done" id="ts2"><span class="ts-dot"></span><span class="ts-label">Preparando</span>
+              </div>
+              <div class="ts-line active" id="tl2"></div>
+              <div class="ts-step active" id="ts3"><span class="ts-dot pulse"></span><span class="ts-label">En
+                  camino</span></div>
+              <div class="ts-line" id="tl3"></div>
+              <div class="ts-step" id="ts4"><span class="ts-dot"></span><span class="ts-label">Entregado</span></div>
+            </div>
+            <div class="rider-info">
+              <div class="rider-avatar">🛵</div>
+              <div class="rider-details">
+                <div class="rider-name">Carlos Méndez</div>
+                <div class="rider-rating">⭐ 4.9 · Tu repartidor</div>
+              </div>
+              <div class="rider-actions">
+                <button class="rider-btn" onclick="showToast('Llamando a Carlos...')">📞</button>
+                <button class="rider-btn" onclick="showToast('Chat abierto')">💬</button>
+              </div>
+            </div>
+            <div class="eta-row">
+              <span class="eta-label">Tiempo estimado</span>
+              <span class="eta-value" id="eta-value">18 min</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ SCREEN: ORDERS ══ -->
+        <div id="screen-orders" class="screen-main">
+          <div class="screen-header">
+            <h2 class="screen-title">Mis Pedidos</h2>
+          </div>
+          <div class="screen-scroll">
+            <div class="orders-list" id="orders-list"></div>
+          </div>
+        </div>
+
+        <!-- ══ SCREEN: WALLET ══ -->
+        <div id="screen-wallet" class="screen-main">
+          <div class="wallet-header">
+            <div class="wallet-top">
+              <h2 class="wallet-title">Mi Wallet</h2>
+              <div class="tier-badge bronze" id="tier-badge">🥉 Bronce</div>
+            </div>
+            <div class="points-display">
+              <div class="pts-big" id="pts-big">350</div>
+              <div class="pts-label">puntos disponibles</div>
+            </div>
+            <div class="tier-progress-wrap">
+              <div class="tier-progress-bar">
+                <div class="tier-progress-fill" id="tier-fill" style="width: 35%"></div>
+              </div>
+              <div class="tier-labels">
+                <span>Bronce</span>
+                <span>650 pts hasta Plata 🥈</span>
+              </div>
+            </div>
+          </div>
+          <div class="wallet-scroll">
+            <div class="section-header">
+              <h2 class="section-title">🎁 Canjear Puntos</h2>
+            </div>
+            <div class="rewards-grid" id="rewards-grid"></div>
+            <div class="section-header" style="margin-top:1.5rem">
+              <h2 class="section-title">📋 Historial de Puntos</h2>
+            </div>
+            <div class="pts-history" id="pts-history"></div>
+            <div class="bottom-spacer"></div>
+          </div>
+        </div>
+
+        <!-- ══ SCREEN: PROFILE ══ -->
+        <div id="screen-profile" class="screen-main">
+          <div class="screen-scroll">
+            <div class="profile-header">
+              <div class="profile-avatar" id="profile-avatar">👤</div>
+              <div class="profile-info">
+                <h2 class="profile-name" id="profile-name">Jairo Paz</h2>
+                <p class="profile-email" id="profile-email">jairo@email.com</p>
+                <div class="profile-tier" id="profile-tier">🥉 Bronce</div>
+              </div>
+            </div>
+            <!-- Preferences panel (#8 dark mode, #16 i18n) -->
+            <div class="profile-prefs">
+              <div class="pref-row">
+                <span class="pref-label"><span class="pref-icon theme-icon" id="theme-icon">🌙</span> <span
+                    data-i18n="darkMode">Modo oscuro</span></span>
+                <label class="toggle"><input type="checkbox" id="theme-toggle" onchange="toggleTheme()" /><span
+                    class="toggle-slider"></span></label>
+              </div>
+              <div class="pref-row">
+                <span class="pref-label"><span class="pref-icon">🌐</span> <span
+                    data-i18n="language">Idioma</span></span>
+                <div class="lang-toggle">
+                  <button class="lang-opt active" data-lang="es" onclick="switchLang('es')">ES</button>
+                  <button class="lang-opt" data-lang="en" onclick="switchLang('en')">EN</button>
+                </div>
+              </div>
+            </div>
+            <div class="profile-menu">
+              <button class="profile-item" onclick="navigateTo('orders')">
+                <span class="pi-icon">📦</span><span class="pi-label">Mis Pedidos</span><span class="pi-arrow">›</span>
+              </button>
+              <button class="profile-item" onclick="navigateTo('wallet')">
+                <span class="pi-icon">❤️</span><span class="pi-label">Mis Favoritos</span><span
+                  class="pi-arrow">›</span>
+              </button>
+              <button class="profile-item" onclick="showAddressModal()">
+                <span class="pi-icon">📍</span><span class="pi-label">Direcciones guardadas</span><span
+                  class="pi-arrow">›</span>
+              </button>
+              <button class="profile-item" onclick="navigateTo('wallet')">
+                <span class="pi-icon">⭐</span><span class="pi-label">Programa de lealtad</span><span
+                  class="pi-arrow">›</span>
+              </button>
+              <button class="profile-item" onclick="showPaymentMethods()">
+                <span class="pi-icon">💳</span><span class="pi-label">Métodos de pago</span><span
+                  class="pi-arrow">›</span>
+              </button>
+              <button class="profile-item" onclick="shareCurrentOrder()">
+                <span class="pi-icon">📤</span><span class="pi-label">Compartir pedido</span><span
+                  class="pi-arrow">›</span>
+              </button>
+              <button class="profile-item" onclick="showToast('Soporte: chat abierto')">
+                <span class="pi-icon">💬</span><span class="pi-label">Ayuda y soporte</span><span
+                  class="pi-arrow">›</span>
+              </button>
+              <button class="profile-item danger" onclick="doLogout()">
+                <span class="pi-icon">🚪</span><span class="pi-label">Cerrar sesión</span><span
+                  class="pi-arrow">›</span>
+              </button>
+            </div>
+            <div class="bottom-spacer"></div>
+          </div>
+        </div>
+
+      </div><!-- /screens-container -->
+
+      <!-- ─── BOTTOM NAV ─── -->
+      <nav class="bottom-nav">
+        <button class="nav-item active" id="nav-home" onclick="navigateTo('home')">
+          <span class="nav-icon">🏠</span><span class="nav-label">Inicio</span>
+        </button>
+        <button class="nav-item" id="nav-menu" onclick="navigateTo('menu')">
+          <span class="nav-icon">🍔</span><span class="nav-label">Menú</span>
+        </button>
+        <button class="nav-item nav-cart-btn" id="nav-cart" onclick="navigateTo('cart')">
+          <span class="nav-icon cart-nav-icon">🛒<span class="nav-cart-badge" id="nav-cart-badge"></span></span>
+          <span class="nav-label">Carrito</span>
+        </button>
+        <button class="nav-item" id="nav-orders" onclick="navigateTo('orders')">
+          <span class="nav-icon">📦</span><span class="nav-label">Pedidos</span>
+        </button>
+        <button class="nav-item" id="nav-profile" onclick="navigateTo('profile')">
+          <span class="nav-icon">👤</span><span class="nav-label">Perfil</span>
+        </button>
+      </nav>
+
+    </div><!-- /main-shell -->
+
+  </div><!-- /app -->
+
+  <!-- ═══════════════════ MODALS ═══════════════════ -->
+
+  <!-- Product Detail Modal -->
+  <div id="product-modal" class="modal-overlay hidden" onclick="closeProductModal(event)">
+    <div class="modal-sheet" id="product-modal-content">
+      <div class="modal-handle"></div>
+      <div class="product-modal-img" id="pm-emoji"></div>
+      <h2 class="pm-name" id="pm-name"></h2>
+      <p class="pm-desc" id="pm-desc"></p>
+      <div class="pm-price-row">
+        <span class="pm-base-price" id="pm-base-price"></span>
+        <div class="qty-control">
+          <button onclick="changeQty(-1)">−</button>
+          <span id="pm-qty">1</span>
+          <button onclick="changeQty(1)">+</button>
+        </div>
+      </div>
+      <div class="modifiers-section" id="modifiers-section"></div>
+      <div class="notes-section">
+        <label class="notes-label">📝 Notas adicionales</label>
+        <textarea class="notes-input" id="pm-notes" placeholder="Ej: sin sal, extra picante..."
+          maxlength="120"></textarea>
+      </div>
+      <button class="btn-add-cart" id="btn-add-cart" onclick="addToCartFromModal()">
+        Añadir al carrito · <span id="pm-total-price"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Delivery Map Modal -->
+  <div id="delivery-modal" class="modal-overlay hidden" onclick="closeDeliveryModal(event)">
+    <div class="modal-sheet delivery-map-sheet">
+      <div class="modal-handle"></div>
+      <h3 class="modal-sheet-title">Confirmar dirección de entrega</h3>
+      <div class="delivery-search-bar" style="display:flex; gap:8px; margin-bottom:10px; padding:0 1.25rem;">
+        <input type="text" id="delivery-search-input" placeholder="Buscar calle, colonia, ciudad..."
+          style="flex:1; padding:10px; border-radius:12px; border:1px solid rgba(255,255,255,0.1); background:var(--surface); color:white; font-family:'Outfit';">
+        <button onclick="searchDeliveryAddress()"
+          style="background:var(--primary); color:white; border:none; padding:10px 15px; border-radius:12px; font-weight:600;">🔍</button>
+      </div>
+      <div id="delivery-map" class="delivery-map-container" style="position:relative;">
+        <button onclick="locateDeliveryUser()"
+          style="position:absolute; bottom:15px; right:15px; z-index:1000; background:white; border:none; border-radius:50%; width:40px; height:40px; box-shadow:0 4px 12px rgba(0,0,0,0.3); font-size:20px; display:flex; align-items:center; justify-content:center; cursor:pointer;"
+          title="Ubicarme">📍</button>
+      </div>
+      <div class="map-pin-overlay">📌</div>
+      <div class="delivery-addr-info">
+        <div class="delivery-addr-text">
+          <strong id="delivery-addr-title">Buscando...</strong>
+          <span id="delivery-addr-subtitle">Mueve el mapa para ajustar</span>
+        </div>
+        <div class="delivery-eta-info">🕐 ~25-35 min · 🚗 $2.50</div>
+      </div>
+      <button class="btn-primary btn-full" onclick="confirmDeliveryAddress()">Confirmar dirección</button>
+    </div>
+  </div>
+
+  <!-- Order Confirmed Modal -->
+  <div id="order-confirmed-modal" class="modal-overlay hidden">
+    <div class="modal-sheet order-confirmed-sheet">
+      <div class="confirmed-animation">
+        <div class="confirmed-circle">
+          <span class="confirmed-check">✓</span>
+        </div>
+      </div>
+      <h2 class="confirmed-title">¡Pedido Confirmado!</h2>
+      <p class="confirmed-sub">Tu pedido #<span id="order-num"></span> está siendo procesado</p>
+      <div class="confirmed-details">
+        <div class="cd-row"><span>⏱ Tiempo estimado</span><strong id="conf-eta">25-35 min</strong></div>
+        <div class="cd-row"><span>⭐ Puntos ganados</span><strong id="conf-pts">+0 pts</strong></div>
+        <div class="cd-row"><span>💳 Método de pago</span><strong>Tarjeta **** 4242</strong></div>
+      </div>
+      <button class="btn-primary btn-full" onclick="goToTracking()">📍 Rastrear pedido</button>
+      <!-- Share button (#18) -->
+      <div class="share-btn-wrap">
+        <button class="share-btn"
+          onclick="shareGivenOrder(document.getElementById('order-num').textContent, document.getElementById('checkout-total')?.textContent)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+            <path
+              d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+          </svg>
+          Compartir por WhatsApp
+        </button>
+      </div>
+      <button class="btn-outline btn-full" onclick="closeConfirmedModal()" style="margin-top:.75rem">Volver al
+        inicio</button>
+    </div>
+  </div>
+
+  <!-- Reward Redeem Modal -->
+  <div id="reward-modal" class="modal-overlay hidden" onclick="closeRewardModal(event)">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="reward-modal-icon" id="rm-icon"></div>
+      <h3 class="rm-title" id="rm-title"></h3>
+      <p class="rm-desc" id="rm-desc"></p>
+      <div class="rm-pts-row"><span class="rm-pts" id="rm-pts"></span> puntos requeridos</div>
+      <button class="btn-primary btn-full" id="rm-redeem-btn" onclick="redeemReward()">Canjear ahora</button>
+    </div>
+  </div>
+
+  <!-- Address Management Modal -->
+  <div id="address-modal" class="modal-overlay hidden" onclick="if(event.target===this) this.classList.add('hidden')">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <h3 class="modal-sheet-title" style="margin-bottom:15px;">Mis Direcciones</h3>
+      <div class="addresses-list" id="saved-addresses-list"
+        style="display:flex; flex-direction:column; gap:10px; max-height:400px; overflow-y:auto; margin-bottom:15px;">
+        <!-- Filled dynamically -->
+      </div>
+      <button class="btn-outline btn-full"
+        onclick="document.getElementById('address-modal').classList.add('hidden'); openDeliveryMap();">➕ Añadir nueva
+        dirección</button>
+    </div>
+  </div>
+
+  <!-- Payment Methods Modal -->
+  <div id="payment-modal" class="modal-overlay hidden" onclick="if(event.target===this) this.classList.add('hidden')">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <h3 class="modal-sheet-title" style="margin-bottom:15px;">Métodos de Pago</h3>
+      <div class="payments-list" style="display:flex; flex-direction:column; gap:10px; margin-bottom:15px;">
+        <div
+          style="background:var(--surface); padding:15px; border-radius:12px; display:flex; align-items:center; justify-content:space-between;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <span style="font-size:24px;">💳</span>
+            <div>
+              <div style="font-weight:600;">Tarjeta Terminada en 4242</div>
+              <div style="font-size:13px; color:var(--text-muted);">Vence 12/28</div>
+            </div>
+          </div>
+          <button style="background:none; border:none; color:var(--danger); font-size:18px;">🗑️</button>
+        </div>
+        <div
+          style="background:var(--surface); padding:15px; border-radius:12px; display:flex; align-items:center; justify-content:space-between;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <span style="font-size:24px;">📱</span>
+            <div>
+              <div style="font-weight:600;">Pago Móvil / Transferencias</div>
+              <div style="font-size:13px; color:var(--text-muted);">Confirmación manual al entregar</div>
+            </div>
+          </div>
+        </div>
+        <div
+          style="background:var(--surface); padding:15px; border-radius:12px; display:flex; align-items:center; justify-content:space-between;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <span style="font-size:24px;">💵</span>
+            <div>
+              <div style="font-weight:600;">Efectivo</div>
+              <div style="font-size:13px; color:var(--text-muted);">Pago al momento de la entrega</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="btn-primary btn-full" onclick="showToast('Función de agregar tarjeta próximamente');">➕ Añadir
+        Tarjeta</button>
+    </div>
+  </div>
+
+  <!-- Floating elements (#4, #6, #13) -->
+  <div id="active-order-bar" class="hidden">
+    <div class="aob-icon">🛵</div>
+    <div class="aob-info">
+      <div class="aob-title">Tu pedido está en camino</div>
+      <div class="aob-sub">Toca para rastrear</div>
+    </div>
+    <span class="aob-arrow">›</span>
+  </div>
+
+  <div id="floating-cart" onclick="navigateTo('cart')">
+    <div class="fc-badge">0</div>
+    <div class="fc-text">Ver carrito</div>
+    <div class="fc-price">$0.00</div>
+  </div>
+
+  <div id="install-prompt">
+    <img src="assets/logo_bocados.jpg" alt="Logo icon" class="ip-icon"
+      style="width:40px;height:40px;border-radius:50%;object-fit:cover;">
+    <div class="ip-text">
+      <div class="ip-title">Instalar BOCADOS APP</div>
+      <div class="ip-sub">Acceso rápido desde tu pantalla de inicio</div>
+    </div>
+    <div class="ip-btns"><button class="ip-install" id="pwa-install-btn">Instalar</button><button class="ip-dismiss"
+        id="pwa-dismiss-btn">Ahora no</button></div>
+  </div>
+
+  <!-- Upsell Popup (#3) -->
+  <div id="upsell-popup">
+    <button class="upsell-close" onclick="closeUpsell()">✕</button>
+    <div class="upsell-title">¿Le añades algo? 🤔</div>
+    <div class="upsell-grid"></div>
+  </div>
+
+  <!-- Star Rating Modal (#10) -->
+  <div id="rating-modal" class="modal-overlay hidden" onclick="this.id=='rating-modal'&&this.classList.add('hidden')">
+    <div class="modal-sheet" style="text-align:center">
+      <div class="modal-handle"></div>
+      <div style="font-size:40px;margin-bottom:8px">⭐</div>
+      <h3 style="margin-bottom:6px">¿Cómo estuvo tu pedido?</h3>
+      <p class="rating-order-info">Pedido reciente</p>
+      <div class="stars-row">
+        <span class="star-btn" onclick="setRating(1)">⭐</span>
+        <span class="star-btn" onclick="setRating(2)">⭐</span>
+        <span class="star-btn" onclick="setRating(3)">⭐</span>
+        <span class="star-btn" onclick="setRating(4)">⭐</span>
+        <span class="star-btn" onclick="setRating(5)">⭐</span>
+      </div>
+      <div class="rating-labels"><span>Muy malo</span><span>Excelente</span></div>
+      <div class="rating-quick">
+        <div class="rq-chip" onclick="toggleRatingChip(this)">Llegó rápido 🚀</div>
+        <div class="rq-chip" onclick="toggleRatingChip(this)">Muy rico 😋</div>
+        <div class="rq-chip" onclick="toggleRatingChip(this)">Bien empacado 📦</div>
+        <div class="rq-chip" onclick="toggleRatingChip(this)">Repartidor amable 🙂</div>
+        <div class="rq-chip" onclick="toggleRatingChip(this)">Lo recomendaría 👍</div>
+      </div>
+      <textarea class="rating-comment" placeholder="Cuéntanos más (opcional)..."></textarea>
+      <button class="btn-primary btn-full" onclick="submitRating()">Enviar reseña · +15 pts ⭐</button>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/improvements.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,51 @@
+{
+    "appId": "com.quickbite.app",
+    "appName": "QuickBite",
+    "webDir": "public",
+    "bundledWebRuntime": false,
+    "backgroundColor": "#0f0f0f",
+    "plugins": {
+        "SplashScreen": {
+            "launchShowDuration": 2000,
+            "launchAutoHide": true,
+            "backgroundColor": "#0f0f0f",
+            "androidSplashResourceName": "splash",
+            "androidScaleType": "CENTER_CROP",
+            "showSpinner": false,
+            "iosSpinnerStyle": "small",
+            "spinnerColor": "#FF416C"
+        },
+        "StatusBar": {
+            "style": "dark",
+            "backgroundColor": "#0f0f0f",
+            "overlaysWebView": false
+        },
+        "PushNotifications": {
+            "presentationOptions": [
+                "badge",
+                "sound",
+                "alert"
+            ]
+        },
+        "Keyboard": {
+            "resize": "body",
+            "style": "dark",
+            "resizeOnFullScreen": true
+        }
+    },
+    "cordova": {},
+    "android": {
+        "minSdkVersion": 24,
+        "targetSdkVersion": 34,
+        "compileSdkVersion": 34,
+        "buildToolsVersion": "34.0.0",
+        "allowMixedContent": false,
+        "captureInput": true,
+        "webContentsDebuggingEnabled": false
+    },
+    "ios": {
+        "contentInset": "automatic",
+        "scrollEnabled": false,
+        "backgroundColor": "#0f0f0f"
+    }
+}

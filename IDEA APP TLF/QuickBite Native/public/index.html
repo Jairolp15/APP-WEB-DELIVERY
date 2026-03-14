@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport"
+        content="viewport-fit=cover, width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="theme-color" content="#0f0f0f" />
+    <title>QuickBite</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/native.css" />
+</head>
+
+<body>
+
+    <!-- SPLASH -->
+    <div id="splash" class="splash">
+        <div class="splash-inner">
+            <div class="splash-logo-wrap">
+                <div class="splash-burger">🍔</div>
+                <div class="splash-brand">QuickBite</div>
+            </div>
+            <div class="splash-sub">El sabor que amas · Siempre cerca</div>
+            <div class="splash-progress">
+                <div class="splash-bar"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- APP -->
+    <div id="app" class="app hidden">
+        <!-- Status bar spacer (native) -->
+        <div class="status-bar-spacer"></div>
+
+        <!-- TOAST -->
+        <div id="toast" class="toast"></div>
+
+        <!-- PUSH NOTIFICATION -->
+        <div id="push-notif" class="push-notif hidden">
+            <div class="push-app-icon">🍔</div>
+            <div class="push-body">
+                <div class="push-app-name">QuickBite</div>
+                <div class="push-title" id="push-title"></div>
+                <div class="push-text" id="push-text"></div>
+            </div>
+            <button class="push-close" onclick="closePush()">✕</button>
+        </div>
+
+        <!-- ═══ AUTH SCREEN ═══ -->
+        <div id="screen-auth" class="screen active">
+            <div class="auth-scroll">
+                <div class="auth-hero">
+                    <div class="auth-hero-bg"></div>
+                    <div class="auth-hero-content">
+                        <div class="auth-burger-icon">🍔</div>
+                        <h1 class="auth-title">QuickBite</h1>
+                        <p class="auth-tagline">El sabor que amas,<br />cuando quieras</p>
+                    </div>
+                </div>
+                <div class="auth-panel">
+                    <div class="auth-tabs">
+                        <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Iniciar
+                            Sesión</button>
+                        <button class="auth-tab" id="tab-register" onclick="switchTab('register')">Registrarse</button>
+                    </div>
+                    <!-- LOGIN -->
+                    <div id="form-login" class="auth-form active">
+                        <div class="field-group">
+                            <label class="field-label">Correo electrónico</label>
+                            <div class="field-wrap">
+                                <span class="field-icon">✉️</span>
+                                <input type="email" id="login-email" class="field-input" placeholder="tu@email.com" />
+                            </div>
+                        </div>
+                        <div class="field-group">
+                            <label class="field-label">Contraseña</label>
+                            <div class="field-wrap">
+                                <span class="field-icon">🔒</span>
+                                <input type="password" id="login-pass" class="field-input" placeholder="••••••••" />
+                            </div>
+                        </div>
+                        <a class="forgot-link" href="#">¿Olvidaste tu contraseña?</a>
+                        <button class="btn-auth" onclick="doLogin()">Iniciar Sesión</button>
+                        <div class="social-divider"><span>o continúa con</span></div>
+                        <div class="social-row">
+                            <button class="btn-social-native" onclick="doSocialLogin('Google')">
+                                <svg width="20" height="20" viewBox="0 0 24 24">
+                                    <path fill="#4285F4"
+                                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                                    <path fill="#34A853"
+                                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                                    <path fill="#FBBC05"
+                                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                                    <path fill="#EA4335"
+                                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                                </svg>
+                                Google
+                            </button>
+                            <button class="btn-social-native btn-apple" onclick="doSocialLogin('Apple')">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                                    <path
+                                        d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
+                                </svg>
+                                Apple
+                            </button>
+                        </div>
+                    </div>
+                    <!-- REGISTER -->
+                    <div id="form-register" class="auth-form">
+                        <div class="field-group">
+                            <label class="field-label">Nombre completo</label>
+                            <div class="field-wrap">
+                                <span class="field-icon">👤</span>
+                                <input type="text" id="reg-name" class="field-input" placeholder="Tu nombre" />
+                            </div>
+                        </div>
+                        <div class="field-group">
+                            <label class="field-label">Correo electrónico</label>
+                            <div class="field-wrap">
+                                <span class="field-icon">✉️</span>
+                                <input type="email" id="reg-email" class="field-input" placeholder="tu@email.com" />
+                            </div>
+                        </div>
+                        <div class="field-group">
+                            <label class="field-label">Contraseña</label>
+                            <div class="field-wrap">
+                                <span class="field-icon">🔒</span>
+                                <input type="password" id="reg-pass" class="field-input"
+                                    placeholder="Mínimo 8 caracteres" />
+                            </div>
+                        </div>
+                        <p class="terms-text">Al crear tu cuenta aceptas los <a href="#">Términos de Servicio</a> y la
+                            <a href="#">Política de Privacidad</a></p>
+                        <button class="btn-auth" onclick="doRegister()">Crear cuenta gratis 🎉</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ MAIN SHELL ═══ -->
+        <div id="main-shell" class="main-shell hidden">
+            <div id="screens" class="screens">
+
+                <!-- ══ HOME ══ -->
+                <div id="screen-home" class="smain active">
+                    <div class="sscroll">
+                        <!-- Header -->
+                        <div class="home-header-n">
+                            <div class="hh-left">
+                                <span class="hh-deliver">Entregar en</span>
+                                <button class="hh-addr" onclick="showAddressSheet()">
+                                    <span class="hh-addr-text" id="hh-addr">Calle Reforma 123</span>
+                                    <span class="hh-chev">▾</span>
+                                </button>
+                            </div>
+                            <div class="hh-right">
+                                <button class="hh-notif" onclick="showPushDemo()" id="hh-notif-btn">
+                                    🔔<span class="notif-dot"></span>
+                                </button>
+                                <button class="hh-wallet" onclick="navigateTo('wallet')">
+                                    <span class="hh-wallet-icon">⭐</span>
+                                    <span class="hh-wallet-pts" id="hh-pts">350</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Greeting -->
+                        <div class="greeting-row">
+                            <h2 class="greeting-text" id="greeting-text">¡Buenas, <span id="greeting-name">Amigo</span>!
+                                👋</h2>
+                            <p class="greeting-sub">¿Qué se te antoja hoy?</p>
+                        </div>
+
+                        <!-- Search -->
+                        <button class="search-n" onclick="navigateTo('menu'); focusSearch()">
+                            <span class="search-n-icon">🔍</span>
+                            <span class="search-n-text">Busca tu favorito...</span>
+                            <span class="search-n-filter">⚙️</span>
+                        </button>
+
+                        <!-- Promo Carousel -->
+                        <div class="carousel-n" id="carousel-n">
+                            <div class="carousel-track" id="carousel-track">
+                                <div class="promo-n" style="background:linear-gradient(135deg,#FF416C 0%,#FF4B2B 100%)">
+                                    <div class="promo-n-content">
+                                        <span class="promo-n-badge">🔥 OFERTA</span>
+                                        <h3 class="promo-n-title">Combo Classic<br />-30% OFF</h3>
+                                        <div class="promo-n-timer" id="ptimer"></div>
+                                        <button class="promo-n-btn" onclick="navigateTo('menu','Combos')">Pedir
+                                            ahora</button>
+                                    </div>
+                                    <div class="promo-n-img">🍔</div>
+                                </div>
+                                <div class="promo-n" style="background:linear-gradient(135deg,#4776E6 0%,#8E54E9 100%)">
+                                    <div class="promo-n-content">
+                                        <span class="promo-n-badge">⚡ NUEVO</span>
+                                        <h3 class="promo-n-title">Burger BBQ<br />Doble carne</h3>
+                                        <p class="promo-n-desc">Angus 200g + tocino + salsa</p>
+                                        <button class="promo-n-btn" onclick="openProduct(2)">Ver ahora</button>
+                                    </div>
+                                    <div class="promo-n-img">🥩</div>
+                                </div>
+                                <div class="promo-n" style="background:linear-gradient(135deg,#11998e 0%,#38ef7d 100%)">
+                                    <div class="promo-n-content">
+                                        <span class="promo-n-badge">🎁 GRATIS</span>
+                                        <h3 class="promo-n-title">Bebida gratis<br />con 500 puntos</h3>
+                                        <button class="promo-n-btn outline"
+                                            onclick="navigateTo('wallet')">Canjear</button>
+                                    </div>
+                                    <div class="promo-n-img">🥤</div>
+                                </div>
+                            </div>
+                            <div class="carousel-dots-n" id="carousel-dots-n"></div>
+                        </div>
+
+                        <!-- Categories -->
+                        <div class="section-n">
+                            <div class="section-n-header">
+                                <h3 class="section-n-title">Categorías</h3>
+                                <button class="section-n-more" onclick="navigateTo('menu')">Ver todo →</button>
+                            </div>
+                            <div class="cats-n">
+                                <button class="cat-n" onclick="navigateTo('menu','Hamburguesas')"><span
+                                        class="cat-n-icon">🍔</span><span class="cat-n-label">Hambur.</span></button>
+                                <button class="cat-n" onclick="navigateTo('menu','Bebidas')"><span
+                                        class="cat-n-icon">🥤</span><span class="cat-n-label">Bebidas</span></button>
+                                <button class="cat-n" onclick="navigateTo('menu','Combos')"><span
+                                        class="cat-n-icon">🍟</span><span class="cat-n-label">Combos</span></button>
+                                <button class="cat-n" onclick="navigateTo('menu','Postres')"><span
+                                        class="cat-n-icon">🍦</span><span class="cat-n-label">Postres</span></button>
+                                <button class="cat-n" onclick="navigateTo('menu','Snacks')"><span
+                                        class="cat-n-icon">🌮</span><span class="cat-n-label">Snacks</span></button>
+                            </div>
+                        </div>
+
+                        <!-- Reorder -->
+                        <div class="section-n">
+                            <div class="section-n-header">
+                                <h3 class="section-n-title">🔄 Pedir de nuevo</h3>
+                            </div>
+                            <div class="reorder-n" id="reorder-n"></div>
+                        </div>
+
+                        <!-- Popular -->
+                        <div class="section-n">
+                            <div class="section-n-header">
+                                <h3 class="section-n-title">⭐ Más populares</h3>
+                                <button class="section-n-more" onclick="navigateTo('menu')">Ver todo →</button>
+                            </div>
+                            <div class="popular-n" id="popular-n"></div>
+                        </div>
+
+                        <!-- Branches -->
+                        <div class="section-n">
+                            <div class="section-n-header">
+                                <h3 class="section-n-title">📍 Sucursales cercanas</h3>
+                            </div>
+                            <div class="branches-n" id="branches-n"></div>
+                        </div>
+                        <div class="nav-spacer"></div>
+                    </div>
+                </div>
+
+                <!-- ══ MENU ══ -->
+                <div id="screen-menu" class="smain">
+                    <div class="screen-hdr">
+                        <h2 class="screen-hdr-title">Menú</h2>
+                        <button class="screen-hdr-btn" onclick="navigateTo('cart')">
+                            🛒 <span class="cart-counter" id="cart-counter">0</span>
+                        </button>
+                    </div>
+                    <div class="menu-search-n">
+                        <div class="search-inline-n">
+                            <span>🔍</span>
+                            <input type="search" id="menu-search-n" class="search-input-n"
+                                placeholder="Buscar en el menú..." oninput="filterProducts(this.value)" />
+                        </div>
+                    </div>
+                    <div class="menu-tabs-n" id="menu-tabs-n"></div>
+                    <div class="menu-scroll-n">
+                        <div class="products-n" id="products-n"></div>
+                    </div>
+                </div>
+
+                <!-- ══ CART ══ -->
+                <div id="screen-cart" class="smain">
+                    <div class="screen-hdr">
+                        <h2 class="screen-hdr-title">Mi Carrito</h2>
+                        <button class="clear-n" onclick="clearCart()">Limpiar</button>
+                    </div>
+                    <div class="cart-scroll-n">
+                        <div id="cart-list-n" class="cart-list-n"></div>
+                        <div id="cart-empty-n" class="cart-empty-n hidden">
+                            <div class="empty-emoji">🛒</div>
+                            <p class="empty-label">Tu carrito está vacío</p>
+                            <button class="btn-empty" onclick="navigateTo('menu')">Explorar Menú</button>
+                        </div>
+                        <!-- Promo -->
+                        <div class="promo-field-n" id="promo-field-n">
+                            <input type="text" id="promo-n-input" class="promo-n-input"
+                                placeholder="🏷️ Código de descuento (QUICKBITE30)" />
+                            <button class="promo-apply-n" onclick="applyPromo()">Aplicar</button>
+                        </div>
+                        <!-- Loyalty -->
+                        <div class="loyalty-n-row" id="loyalty-n-row">
+                            <div class="loyalty-n-info">
+                                <span class="loyalty-n-icon">⭐</span>
+                                <div>
+                                    <div class="loyalty-n-main">Usar puntos de lealtad</div>
+                                    <div class="loyalty-n-sub" id="pts-sub">350 pts disponibles → -$3.50</div>
+                                </div>
+                            </div>
+                            <label class="switch"><input type="checkbox" id="pts-toggle"
+                                    onchange="toggleLoyalty()" /><span class="switch-track"></span></label>
+                        </div>
+                        <!-- Totals -->
+                        <div class="totals-n" id="totals-n"></div>
+                        <!-- Order type -->
+                        <div class="order-type-n">
+                            <h4 class="ot-title">¿Cómo recibirás tu pedido?</h4>
+                            <div class="ot-tabs">
+                                <button class="ot-tab active" id="ot-pickup" onclick="setOT('pickup')">
+                                    <span class="ot-emoji">🏃</span><span class="ot-name">Recoger</span><span
+                                        class="ot-note">Pick-up</span>
+                                </button>
+                                <button class="ot-tab" id="ot-delivery" onclick="setOT('delivery')">
+                                    <span class="ot-emoji">🚗</span><span class="ot-name">Delivery</span><span
+                                        class="ot-note">A domicilio</span>
+                                </button>
+                            </div>
+                            <div id="pickup-detail" class="ot-detail">
+                                <p class="ot-detail-label">Hora de recogida</p>
+                                <div class="time-slots-n" id="time-slots-n"></div>
+                                <div class="branch-info-n"><span>📍</span>
+                                    <div><strong>Centro Histórico</strong><span>0.8 km · 10 min caminando</span></div>
+                                </div>
+                            </div>
+                            <div id="delivery-detail" class="ot-detail hidden">
+                                <p class="ot-detail-label">Dirección de entrega</p>
+                                <button class="addr-btn-n" onclick="openDeliveryMap()">
+                                    <span>📍</span>
+                                    <div class="addr-btn-info"><strong>Calle Reforma 123</strong><span>Toca para
+                                            confirmar en mapa</span></div><span>›</span>
+                                </button>
+                                <p class="ot-detail-label" style="margin-top:14px">Método de pago</p>
+                                <div class="pay-opts-n">
+                                    <label class="pay-opt-n selected"><input type="radio" name="payn" value="card"
+                                            checked /> 💳 Tarjeta **** 4242</label>
+                                    <label class="pay-opt-n"><input type="radio" name="payn" value="cash" /> 💵 Efectivo
+                                        al recibir</label>
+                                    <label class="pay-opt-n"><input type="radio" name="payn" value="new" /> ➕ Nueva
+                                        tarjeta</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cart-footer-n" id="cart-footer-n">
+                        <button class="btn-checkout-n" onclick="placeOrder()">
+                            Confirmar Pedido · <span id="checkout-total-n">$0.00</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ══ TRACKING ══ -->
+                <div id="screen-tracking" class="smain">
+                    <div class="tracking-hdr">
+                        <button class="back-n" onclick="navigateTo('orders')">‹</button>
+                        <h2 class="tracking-title">Rastreo en Vivo</h2>
+                        <button class="track-share" onclick="showToast('Enlace copiado')">⬆️</button>
+                    </div>
+                    <div id="map-n" class="map-n"></div>
+                    <div class="tracking-card-n">
+                        <div class="track-status-n" id="track-status-n">
+                            <div class="ts-n done" id="tsn1">
+                                <div class="ts-n-dot"></div>
+                                <div class="ts-n-label">Recibido</div>
+                            </div>
+                            <div class="ts-n-line done"></div>
+                            <div class="ts-n done" id="tsn2">
+                                <div class="ts-n-dot"></div>
+                                <div class="ts-n-label">Preparando</div>
+                            </div>
+                            <div class="ts-n-line active"></div>
+                            <div class="ts-n active" id="tsn3">
+                                <div class="ts-n-dot pulse"></div>
+                                <div class="ts-n-label">En camino</div>
+                            </div>
+                            <div class="ts-n-line"></div>
+                            <div class="ts-n" id="tsn4">
+                                <div class="ts-n-dot"></div>
+                                <div class="ts-n-label">Entregado</div>
+                            </div>
+                        </div>
+                        <div class="rider-n">
+                            <div class="rider-n-ava">🛵</div>
+                            <div class="rider-n-info"><strong>Carlos Méndez</strong><span>⭐ 4.9 · Repartidor
+                                    verificado</span></div>
+                            <div class="rider-n-btns">
+                                <button class="rider-n-btn" onclick="showToast('Llamando...')">📞</button>
+                                <button class="rider-n-btn" onclick="showToast('Chat abierto')">💬</button>
+                            </div>
+                        </div>
+                        <div class="eta-n"><span class="eta-n-label">Tiempo estimado de entrega</span><span
+                                class="eta-n-val" id="eta-n">18 min</span></div>
+                    </div>
+                </div>
+
+                <!-- ══ ORDERS ══ -->
+                <div id="screen-orders" class="smain">
+                    <div class="screen-hdr">
+                        <h2 class="screen-hdr-title">Mis Pedidos</h2>
+                    </div>
+                    <div class="sscroll">
+                        <div class="orders-n" id="orders-n"></div>
+                        <div class="nav-spacer"></div>
+                    </div>
+                </div>
+
+                <!-- ══ WALLET ══ -->
+                <div id="screen-wallet" class="smain">
+                    <div class="wallet-hdr-n">
+                        <div class="wallet-top-n">
+                            <h2 class="wallet-title-n">Mi Wallet</h2>
+                            <div class="tier-pill bronze" id="tier-pill-n">🥉 Bronce</div>
+                        </div>
+                        <div class="pts-display-n">
+                            <div class="pts-big-n" id="pts-big-n">350</div>
+                            <div class="pts-label-n">puntos disponibles</div>
+                        </div>
+                        <div class="tier-bar-n">
+                            <div class="tier-fill-n" id="tier-fill-n" style="width:35%"></div>
+                        </div>
+                        <div class="tier-bar-labels"><span>Bronce 🥉</span><span>650 pts para Plata 🥈</span></div>
+                        <!-- Quick actions -->
+                        <div class="wallet-quick-n">
+                            <button class="wq-btn" onclick="showToast('Historial de puntos')">📋 Historial</button>
+                            <button class="wq-btn" onclick="showToast('Cupones activos')">🏷️ Cupones</button>
+                            <button class="wq-btn" onclick="showToast('Referidos')">👥 Referir</button>
+                        </div>
+                    </div>
+                    <div class="sscroll" style="flex:1;overflow-y:auto">
+                        <div class="section-n" style="padding:16px 16px 0">
+                            <div class="section-n-header">
+                                <h3 class="section-n-title">🎁 Catálogo de recompensas</h3>
+                            </div>
+                        </div>
+                        <div class="rewards-n" id="rewards-n"></div>
+                        <div class="section-n" style="padding:16px 16px 0">
+                            <div class="section-n-header">
+                                <h3 class="section-n-title">📋 Últimos movimientos</h3>
+                            </div>
+                        </div>
+                        <div class="pts-hist-n" id="pts-hist-n"></div>
+                        <div class="nav-spacer"></div>
+                    </div>
+                </div>
+
+                <!-- ══ PROFILE ══ -->
+                <div id="screen-profile" class="smain">
+                    <div class="sscroll">
+                        <div class="profile-hdr-n">
+                            <div class="profile-ava-n" id="profile-ava-n">👤</div>
+                            <h2 class="profile-name-n" id="profile-name-n">Usuario</h2>
+                            <p class="profile-email-n" id="profile-email-n">usuario@email.com</p>
+                            <div class="profile-tier-pill" id="profile-tier-n">🥉 Bronce · 350 pts</div>
+                        </div>
+                        <div class="profile-stats-n">
+                            <div class="pstat">
+                                <div class="pstat-val">7</div>
+                                <div class="pstat-label">Pedidos</div>
+                            </div>
+                            <div class="pstat-divider"></div>
+                            <div class="pstat">
+                                <div class="pstat-val">350</div>
+                                <div class="pstat-label">Puntos</div>
+                            </div>
+                            <div class="pstat-divider"></div>
+                            <div class="pstat">
+                                <div class="pstat-val">$98</div>
+                                <div class="pstat-label">Gastados</div>
+                            </div>
+                        </div>
+                        <div class="profile-menu-n">
+                            <button class="pmenu-item" onclick="navigateTo('orders')"><span class="pi-i">📦</span><span
+                                    class="pi-t">Mis Pedidos</span><span class="pi-a">›</span></button>
+                            <button class="pmenu-item" onclick="navigateTo('wallet')"><span class="pi-i">⭐</span><span
+                                    class="pi-t">Programa de Lealtad</span><span class="pi-a">›</span></button>
+                            <button class="pmenu-item" onclick="showAddressSheet()"><span class="pi-i">📍</span><span
+                                    class="pi-t">Mis Direcciones</span><span class="pi-a">›</span></button>
+                            <button class="pmenu-item" onclick="showToast('Métodos de pago')"><span
+                                    class="pi-i">💳</span><span class="pi-t">Métodos de Pago</span><span
+                                    class="pi-a">›</span></button>
+                            <button class="pmenu-item" onclick="showToast('Configurar notificaciones')"><span
+                                    class="pi-i">🔔</span><span class="pi-t">Notificaciones</span><span
+                                    class="pi-a">›</span></button>
+                            <button class="pmenu-item" onclick="showToast('Soporte al cliente')"><span
+                                    class="pi-i">💬</span><span class="pi-t">Ayuda y Soporte</span><span
+                                    class="pi-a">›</span></button>
+                            <button class="pmenu-item" onclick="showToast('Acerca de QuickBite v1.0')"><span
+                                    class="pi-i">ℹ️</span><span class="pi-t">Acerca de</span><span
+                                    class="pi-a">›</span></button>
+                        </div>
+                        <button class="btn-logout" onclick="doLogout()">Cerrar Sesión</button>
+                        <div class="nav-spacer"></div>
+                    </div>
+                </div>
+
+            </div><!-- /screens -->
+
+            <!-- BOTTOM NAV -->
+            <nav class="nav-n">
+                <button class="nav-n-item active" id="nnav-home" onclick="navigateTo('home')"><span
+                        class="nnav-icon">🏠</span><span class="nnav-label">Inicio</span></button>
+                <button class="nav-n-item" id="nnav-menu" onclick="navigateTo('menu')"><span
+                        class="nnav-icon">🍔</span><span class="nnav-label">Menú</span></button>
+                <button class="nav-n-item nav-n-center" id="nnav-cart" onclick="navigateTo('cart')">
+                    <div class="nav-center-btn"><span class="nnav-center-icon">🛒</span><span
+                            class="nnav-n-badge hidden" id="nnav-badge">0</span></div>
+                    <span class="nnav-label">Carrito</span>
+                </button>
+                <button class="nav-n-item" id="nnav-orders" onclick="navigateTo('orders')"><span
+                        class="nnav-icon">📦</span><span class="nnav-label">Pedidos</span></button>
+                <button class="nav-n-item" id="nnav-profile" onclick="navigateTo('profile')"><span
+                        class="nnav-icon">👤</span><span class="nnav-label">Perfil</span></button>
+            </nav>
+        </div><!-- /main-shell -->
+    </div><!-- /app -->
+
+    <!-- ═══ MODALS ═══ -->
+    <!-- Product Modal -->
+    <div id="mod-product" class="mod-overlay hidden" onclick="closeMod('product',event)">
+        <div class="mod-sheet" id="mod-product-sheet">
+            <div class="mod-handle"></div>
+            <button class="mod-close-x" onclick="closeMod('product')">✕</button>
+            <div class="pm-hero" id="pm-hero"></div>
+            <h2 class="pm-name" id="pm-name"></h2>
+            <p class="pm-desc" id="pm-desc"></p>
+            <div class="pm-row">
+                <div class="pm-price" id="pm-price"></div>
+                <div class="qty-n">
+                    <button class="qty-n-btn" onclick="changeQty(-1)">−</button>
+                    <span class="qty-n-val" id="pm-qty">1</span>
+                    <button class="qty-n-btn" onclick="changeQty(1)">+</button>
+                </div>
+            </div>
+            <div id="mods-container"></div>
+            <div class="notes-n">
+                <label class="notes-n-label">📝 Instrucciones especiales</label>
+                <textarea class="notes-n-area" id="pm-notes" placeholder="Sin sal, extra picante..."
+                    maxlength="120"></textarea>
+            </div>
+            <button class="btn-add-n" onclick="addToCartFromModal()">Añadir · <span id="pm-total"></span></button>
+        </div>
+    </div>
+
+    <!-- Delivery Map Modal -->
+    <div id="mod-delivery" class="mod-overlay hidden" onclick="closeMod('delivery',event)">
+        <div class="mod-sheet delivery-mod-sheet">
+            <div class="mod-handle"></div>
+            <h3 class="mod-sheet-title">Confirmar ubicación</h3>
+            <div id="delivery-map-n" class="delivery-map-n"></div>
+            <div class="delivery-info-n">
+                <div class="di-left"><strong>Calle Reforma 123</strong><span>Ciudad de México · ~25 min</span></div>
+                <div class="di-right">🚗 $2.50</div>
+            </div>
+            <button class="btn-auth" onclick="confirmAddr()"
+                style="margin:0 16px 20px;width:calc(100% - 32px)">Confirmar dirección</button>
+        </div>
+    </div>
+
+    <!-- Order Confirmed Modal -->
+    <div id="mod-confirmed" class="mod-overlay hidden">
+        <div class="mod-sheet confirmed-sheet">
+            <div class="confirmed-anim">
+                <div class="confirmed-ring"><span class="confirmed-chk">✓</span></div>
+            </div>
+            <h2 class="confirmed-h">¡Listo! Pedido confirmado</h2>
+            <p class="confirmed-sub">Pedido <strong>#<span id="conf-num"></span></strong></p>
+            <div class="confirmed-stats">
+                <div class="cstat">
+                    <div class="cstat-label">Tiempo estimado</div>
+                    <div class="cstat-val" id="conf-eta-n">25-35 min</div>
+                </div>
+                <div class="cstat-div"></div>
+                <div class="cstat">
+                    <div class="cstat-label">Puntos ganados</div>
+                    <div class="cstat-val pts-color" id="conf-pts-n">+0 pts</div>
+                </div>
+            </div>
+            <button class="btn-auth" onclick="goToTracking()">📍 Ver en el mapa</button>
+            <button class="btn-secondary-n" onclick="closeConfirmed()">Volver al inicio</button>
+        </div>
+    </div>
+
+    <!-- Reward Modal -->
+    <div id="mod-reward" class="mod-overlay hidden" onclick="closeMod('reward',event)">
+        <div class="mod-sheet">
+            <div class="mod-handle"></div>
+            <div class="rm-hero" id="rm-hero"></div>
+            <h3 class="rm-title" id="rm-title"></h3>
+            <p class="rm-desc" id="rm-desc"></p>
+            <div class="rm-pts-row"><span class="rm-pts" id="rm-pts"></span> puntos requeridos</div>
+            <button class="btn-auth" id="rm-btn" onclick="redeemReward()">Canjear recompensa ✨</button>
+        </div>
+    </div>
+
+    <!-- Address Sheet -->
+    <div id="mod-address" class="mod-overlay hidden" onclick="closeMod('address',event)">
+        <div class="mod-sheet">
+            <div class="mod-handle"></div>
+            <h3 class="mod-sheet-title">Mis Direcciones</h3>
+            <div class="addr-list-n">
+                <div class="addr-item-n active"><span>🏠</span>
+                    <div><strong>Casa</strong><span>Calle Reforma 123, CDMX</span></div><span
+                        class="addr-check">✓</span>
+                </div>
+                <div class="addr-item-n"><span>💼</span>
+                    <div><strong>Trabajo</strong><span>Av. Insurgentes 456, CDMX</span></div>
+                </div>
+                <button class="add-addr-btn">+ Añadir nueva dirección</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>
