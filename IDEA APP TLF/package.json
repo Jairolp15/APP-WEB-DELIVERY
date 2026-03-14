@@ -4,7 +4,8 @@
   "description": "BOCADOS APP – Fast Food PWA",
   "main": "index.html",
   "scripts": {
-    "start": "serve ."
+    "start": "serve .",
+    "build": "echo 'Static site detected - no build needed'"
   },
   "dependencies": {
     "serve": "^14.2.1"

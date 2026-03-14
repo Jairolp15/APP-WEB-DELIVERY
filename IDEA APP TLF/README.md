@@ -8,7 +8,10 @@ Esta es una aplicación web estática (PWA) configurada para desplegarse fácilm
 2. Ve a [Railway.app](https://railway.app/).
 3. Haz clic en **"New Project"**.
 4. Selecciona **"Deploy from GitHub repo"** y elige tu repositorio.
-5. Railway detectará el archivo `package.json` y desplegará el sitio automáticamente usando el comando `npm start`.
+5. **IMPORTANTE**: Si el despliegue falla con "Railpack could not determine how to build", ve a:
+   - **Settings** -> **General** -> **Root Directory**.
+   - Asegúrate de que apunte a la carpeta donde están estos archivos (probablemente `IDEA APP TLF`).
+6. Asegúrate también en **Settings** -> **Build** que el **Builder** sea **DOCKERFILE**.
 
 ## Estructura de Archivos
 - `index.html`: Punto de entrada principal.
